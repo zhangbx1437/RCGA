@@ -356,7 +356,6 @@ class Def{
 			}
 		}
 	}
-	
 	public void mutation(){                                  //变异，5%的概率随机选择位进行变异
 		double m=20;
 		int a;
@@ -377,8 +376,7 @@ class Def{
 		for (int i = 0; i < num; i++) {
 			if (Math.random()<0.08) {
 				for (int j = 0; j < SetPar.parnum; j++) {
-					if (Math.random()<0.5) {
-						
+					if (initialpops[i][j]-min[j]<0.5*(max[j]-min[j])) {
 						f[i][j]=initialpops[i][j]+0.5*(max[j]-min[j])*delta;
 					}
 					else {
