@@ -31,6 +31,7 @@ import bsh.Interpreter;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Random;
 
 
 
@@ -187,6 +188,9 @@ class Def{
 //			} catch (EvalError e) {
 //
 //			}
+		int seq[]=new int[num];
+		Random random=new Random();
+		
 		for (int i = 0; i < num; i++) {
 			switch (SetPar.parnum) {
 			case 2:
@@ -202,9 +206,21 @@ class Def{
 				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3],initialpops[i][4]);
 				break;
 			}
+		}	
+			//锦标赛法选择
+		for (int i = 0; i < seq.length; i++) {
+			int randnum=random.nextInt(num);	
+			if (fits[i]<fits[randnum]) {
+				for (int j = 0; j < SetPar.parnum; j++) {
+					initialpops[i][j]=initialpops[randnum][j];
+				}
+			}
+		}
+			
+			
 //			fits1[i]=fits[i]+Math.exp(20);
 //			F = F+fits1[i];
-		}
+		
 //		for (int i = 0; i < num; i++) {
 //			fits1[i]=fits[i];
 //		}
