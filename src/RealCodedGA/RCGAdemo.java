@@ -188,7 +188,6 @@ class Def{
 //			} catch (EvalError e) {
 //
 //			}
-		int seq[]=new int[num];
 		Random random=new Random();
 		
 		for (int i = 0; i < num; i++) {
@@ -208,7 +207,7 @@ class Def{
 			}
 		}	
 			//锦标赛法选择
-		for (int i = 0; i < seq.length; i++) {
+		for (int i = 0; i < num; i++) {
 			int randnum=random.nextInt(num);	
 			if (fits[i]<fits[randnum]) {
 				for (int j = 0; j < SetPar.parnum; j++) {
@@ -288,18 +287,16 @@ class Def{
 	public void cross(){                                    //交叉
 		double m[][]=new double [num][SetPar.parnum];
 		double a,b;
-		double alpha[]=new double[SetPar.parnum];
-		int n=1;
-		for (int i = 0; i < num ;i++) {
-			int k=(int) ((Math.random()*num)%num);
-			if (Math.random()<0.75) {
+		for (int i = 0; i < num-1;) {
 				for (int j = 0; j < SetPar.parnum; j++) {
-					System.out.println("alpha="+alpha[j]);
-					if (k==i) {
-						k=(k+1)%num;
+					if (Math.random()<0.75) {
+						double alpha=Math.random();
+						m[i][j]=alpha*initialpops[i][j]+(1-alpha)*initialpops[i+1][j];
+						m[i+1][j]=alpha*initialpops[i+1][j]+(1-alpha)*initialpops[i][j];
 					}
-					alpha[j] =fits[i] / (fits[k] + fits[i]);
-					m[i][j]=initialpops[i][j]-(1-alpha[j])*(initialpops[i][j]-initialpops[k][j]);
+				}
+				i=i+2;
+		}
 //					do {
 //						n++;
 //						m[i][j]=initialpops[i][j]-Math.pow(1-alpha[j],n)*(initialpops[i][j]-initialpops[k][j]);
@@ -324,40 +321,42 @@ class Def{
 //							m[i][j]=initialpops[i][j]-Math.pow(1-alpha,n)*(initialpops[i][j]-initialpops[(i+1)/num][j]);
 //						}
 //					}while(m[i][j]<min[j]||m[i][j]>max[j]);
-					switch (SetPar.parnum) {
-					case 2:
-						a=popToNumber(m[i][0], m[i][1]);
-						b=popToNumber(initialpops[i][0], initialpops[i][1]);
-						if (a>=b) {
-							initialpops[i][j]=m[i][j];
-						}
+		for (int k = 0; k < m.length; k++) {
+			for (int k2 = 0; k2 < m.length; k2++) {
+				switch (SetPar.parnum) {
+				case 2:
+					a=popToNumber(m[k][0], m[k][1]);
+					b=popToNumber(initialpops[k][0], initialpops[k][1]);
+					if (a>=b) {
+						initialpops[k][k2]=m[k][k2];
+					}
+					break;
+				case 3:
+					a=popToNumber(m[k][0], m[k][1], m[k][2]);
+					b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2]);
+					if (a>=b) {
+						initialpops[k][k2]=m[k][k2];
+					}
+					break;	
+				case 4:
+					a=popToNumber(m[k][0], m[k][1], m[k][2], m[k][3]);
+					b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2], initialpops[k][3]);
+					if (a>=b) {
+						initialpops[k][k2]=m[k][k2];
+					}
+					break;
+				case 5:
+					a=popToNumber(m[k][0], m[k][1], m[k][2], m[k][3], m[k][4]);
+					b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2], initialpops[k][3], initialpops[k][4]);
+					if (a>=b) {
+						initialpops[k][k2]=m[k][k2];
 						break;
-					case 3:
-						a=popToNumber(m[i][0], m[i][1], m[i][2]);
-						b=popToNumber(initialpops[i][0], initialpops[i][1], initialpops[i][2]);
-						if (a>=b) {
-							initialpops[i][j]=m[i][j];
-						}
-						break;	
-					case 4:
-						a=popToNumber(m[i][0], m[i][1], m[i][2], m[i][3]);
-						b=popToNumber(initialpops[i][0], initialpops[i][1], initialpops[i][2], initialpops[i][3]);
-						if (a>=b) {
-							initialpops[i][j]=m[i][j];
-						}
-						break;
-					case 5:
-						a=popToNumber(m[i][0], m[i][1], m[i][2], m[i][3], m[i][4]);
-						b=popToNumber(initialpops[i][0], initialpops[i][1], initialpops[i][2], initialpops[i][3], initialpops[i][4]);
-						if (a>=b) {
-							initialpops[i][j]=m[i][j];
-						break;
-						}
 					}
 				}
 			}
 		}
 	}
+	
 	public void mutation(){                                  //变异，5%的概率随机选择位进行变异
 		double m=20;
 		int a;
