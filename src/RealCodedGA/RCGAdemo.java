@@ -31,8 +31,7 @@ import bsh.Interpreter;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
+
 
 
 class Def{
@@ -54,7 +53,7 @@ class Def{
 //						  Double.parseDouble(SetPar.pre5.getText())};                      //精度
 //	public static int anum;
 //	public int a=cala(anum);                 //a为个体的位数
-	public int num=12;                        //种群中的个体数
+	public int num=Integer.parseInt(SetPar.numofind);                        //种群中的个体数
 	double[] fits = new double[num];          //个体适应值
 	double[] fits1 = new double[num];
 	int number[]=new int[num];
@@ -178,7 +177,7 @@ class Def{
 //		return dec;
 //	}
 	public void select(){                  //计算种群每个个体的适应值
-		double F = 0;
+		
 //		fun[0]=func.replaceAll("x1", String.valueOf(Integer.parseInt(c[0], 2)));
 //		Interpreter inter=new Interpreter();
 //		
