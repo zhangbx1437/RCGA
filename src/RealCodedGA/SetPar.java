@@ -9,7 +9,6 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
@@ -23,13 +22,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import net.miginfocom.swing.MigLayout;
 import javax.swing.SpringLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.RowSpec;
-import java.awt.FlowLayout;
 
 public class SetPar extends JFrame {
 

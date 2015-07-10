@@ -32,6 +32,8 @@ import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Random;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 
 
 
@@ -47,57 +49,19 @@ class Def{
 					 	  Double.parseDouble(SetPar.max3.getText()),
 					 	  Double.parseDouble(SetPar.max4.getText()),
 					 	  Double.parseDouble(SetPar.max5.getText())};                       //参数的取值上界
-//	public double [] pre={Double.parseDouble(SetPar.pre1.getText()),
-//						  Double.parseDouble(SetPar.pre2.getText()),
-//						  Double.parseDouble(SetPar.pre3.getText()),
-//						  Double.parseDouble(SetPar.pre4.getText()),
-//						  Double.parseDouble(SetPar.pre5.getText())};                      //精度
-//	public static int anum;
-//	public int a=cala(anum);                 //a为个体的位数
 	public int num=Integer.parseInt(SetPar.numofind);                        //种群中的个体数
 	double[] fits = new double[num];          //个体适应值
-	double[] fits1 = new double[num];
 	int number[]=new int[num];
+	public static int numb=Integer.parseInt(SetPar.MaxIter.getText());
 	public double best[]=new double[SetPar.parnum];                 //最适应个体
-	double[] p = new double[num];            //个体适应值占适应值总和的概率
-	double[] q = new double[num];            //概率和
 	public double fitness=0;                 //最适应值
 	public double[][] initialpops =new double[num][SetPar.parnum];      //初始种群
 	public int generation;                   //最适应值在种群中的位置
-//	public int cala(int a){                  //计算转换为二进制需要的位数
-//		if (a==0) {
-//			return 0;
-//		} else {
-//			int i=0;
-//			while ((int) Math.pow(2, i)<a) {
-//		    i++;
-//				
-//			}
-//			return i;
-//		}
-//		
-//	}
-	
-//	public String initialPop() {             //初始化一个个体
-//		String b=""; 
-//		for (int i = 0; i < a; i++){
-//			if (Math.random()>0.5) {
-//			b=b+"0";
-//			}
-//		else {
-//			b=b+"1";
-//		 	}
-//		}
-//			return b;	
-//	}
 	public void initial() {         //初始化一个种群
 		for (int i = 0; i < num; i++) {
 			for (int j = 0; j < SetPar.parnum; j++) {
 				initialpops[i][j]=min[j]+(max[j]-min[j])*Math.random();                                               //不考虑精度
-//				initialpops[i][j]=Double.valueOf((int)(min[j]+(max[j]-min[j])*Math.random())/pre[j])*pre[j];          //产生区间内的随机数，符合精度
-				System.out.print(initialpops[i][j]+"   ");
 			}
-			System.out.println("  ");
 		}
 	}
 	public double popToNumber(double str1, double str2) {             //将输入字符串转为函数表达式,返回适应值
@@ -172,11 +136,28 @@ class Def{
 			return fit;
 
 	}
-	//	public double Decode(String str){           //解码，二进制字符串转为对应的实数
-//		String s=str;
-//		double dec=min+pre*Integer.parseInt(s);
-//		return dec;
-//	}
+
+	public void calculate(){
+		double sumfit=0;
+		for (int i = 0; i < num; i++) {
+			switch (SetPar.parnum) {
+			case 2:
+				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1]);
+				break;
+			case 3:
+				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2]);
+				break;
+			case 4:
+				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3]);
+				break;
+			case 5:
+				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3],initialpops[i][4]);
+				break;
+			}
+			sumfit+=fits[i];
+		}
+		fitness=sumfit/num;
+	}
 	public void select(){                  //计算种群每个个体的适应值
 		
 //		fun[0]=func.replaceAll("x1", String.valueOf(Integer.parseInt(c[0], 2)));
@@ -215,88 +196,19 @@ class Def{
 				}
 			}
 		}
-			
-			
-//			fits1[i]=fits[i]+Math.exp(20);
-//			F = F+fits1[i];
-		
-//		for (int i = 0; i < num; i++) {
-//			fits1[i]=fits[i];
-//		}
-//		HashMap<Double, Integer> map=new HashMap<Double, Integer>();
-//		for (int i = 0; i < num; i++) {
-//			map.put(fits1[i], i);
-//		}
-//		Arrays.sort(fits1);
-//		for (int i = 0; i < num; i++) {
-//			System.out.println(fits[i]);
-//		}
-//		for (int i = 0; i < num; i++) {
-//			number[i]=map.get(fits1[i]);
-//			System.out.println(number[i]);
-//		}
-//		for (int i = 0; i < num; i++) {
-//			System.out.println(fits[number[i]]);
-//		}
-//		for (int i = 0; i < num; i++) {
-//			F=F+i+1;
-//		}
-//		System.out.println(F);
-//		for (int i = 0; i < num; i++) {
-//				p[i]=(i+1)/F;
-//				System.out.println("p[i]="+p[i]);
-//				if (i==0) {
-//					q[i]=p[i];
-//				}
-//				else {
-//					q[i]=q[i-1]+p[i];
-//				}
-//				System.out.println(q[i]);
-//			}
-//			for (int i = 0; i < num; i++) {
-//				double r = Math.random();
-//				if (r<q[0]) {
-//					for (int j = 0; j < SetPar.parnum; j++) {
-//						initialpops[i][j]=initialpops[number[0]][j];
-//					}
-//				} else {
-//					for (int j = 1; j < num; j++) {
-//						if (r<q[j]) {
-//							for (int k = 0; k < SetPar.parnum; k++) {
-//								initialpops[i][k]=initialpops[number[j]][k];
-//							}
-//							break;
-//						}
-//					}
-//				}
-//			if (i==0) {
-//				fitness=fits[number[i]];
-//				for (int j = 0; j < SetPar.parnum; j++) {
-//					best[j]=initialpops[number[i]][j];
-//				}
-//			}
-//		else if (fits[number[i]]>fitness) {
-//				fitness=fits[number[i]];
-//				for (int k = 0; k < SetPar.parnum; k++) {
-//					best[k] = initialpops[number[i]][k];
-//				}
-//			}
-//			
-//		}
 	}
 	public void cross(){                                    //交叉
 		double m[][]=new double [num][SetPar.parnum];
 		double a,b;
-		for (int i = 0; i < num-1;) {
+		if (Math.random()<0.8) {
+			for (int i = 0; i < num-1; i=i+2) {
 				for (int j = 0; j < SetPar.parnum; j++) {
-					if (Math.random()<0.75) {
-						double alpha=Math.random();
-						m[i][j]=alpha*initialpops[i][j]+(1-alpha)*initialpops[i+1][j];
-						m[i+1][j]=alpha*initialpops[i+1][j]+(1-alpha)*initialpops[i][j];
-					}
+					double alpha=Math.random();
+					m[i][j]=alpha*initialpops[i][j]+(1-alpha)*initialpops[i+1][j];
+					m[i+1][j]=alpha*initialpops[i+1][j]+(1-alpha)*initialpops[i][j];
 				}
-				i=i+2;
-		}
+			}
+		
 //					do {
 //						n++;
 //						m[i][j]=initialpops[i][j]-Math.pow(1-alpha[j],n)*(initialpops[i][j]-initialpops[k][j]);
@@ -321,42 +233,43 @@ class Def{
 //							m[i][j]=initialpops[i][j]-Math.pow(1-alpha,n)*(initialpops[i][j]-initialpops[(i+1)/num][j]);
 //						}
 //					}while(m[i][j]<min[j]||m[i][j]>max[j]);
-		for (int k = 0; k < m.length; k++) {
-			for (int k2 = 0; k2 < m.length; k2++) {
-				switch (SetPar.parnum) {
-				case 2:
-					a=popToNumber(m[k][0], m[k][1]);
-					b=popToNumber(initialpops[k][0], initialpops[k][1]);
-					if (a>=b) {
-						initialpops[k][k2]=m[k][k2];
-					}
-					break;
-				case 3:
-					a=popToNumber(m[k][0], m[k][1], m[k][2]);
-					b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2]);
-					if (a>=b) {
-						initialpops[k][k2]=m[k][k2];
-					}
-					break;	
-				case 4:
-					a=popToNumber(m[k][0], m[k][1], m[k][2], m[k][3]);
-					b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2], initialpops[k][3]);
-					if (a>=b) {
-						initialpops[k][k2]=m[k][k2];
-					}
-					break;
-				case 5:
-					a=popToNumber(m[k][0], m[k][1], m[k][2], m[k][3], m[k][4]);
-					b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2], initialpops[k][3], initialpops[k][4]);
-					if (a>=b) {
-						initialpops[k][k2]=m[k][k2];
+			for (int k = 0; k < num; k++) {
+				for (int k2 = 0; k2 < SetPar.parnum; k2++) {
+					switch (SetPar.parnum) {
+					case 2:
+						a=popToNumber(m[k][0], m[k][1]);
+						b=popToNumber(initialpops[k][0], initialpops[k][1]);
+						if (a>=b) {
+							initialpops[k][k2]=m[k][k2];
+						}
 						break;
+					case 3:
+						a=popToNumber(m[k][0], m[k][1], m[k][2]);
+						b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2]);
+						if (a>=b) {
+							initialpops[k][k2]=m[k][k2];
+						}
+						break;	
+					case 4:
+						a=popToNumber(m[k][0], m[k][1], m[k][2], m[k][3]);
+						b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2], initialpops[k][3]);
+						if (a>=b) {
+							initialpops[k][k2]=m[k][k2];
+						}
+						break;
+					case 5:
+						a=popToNumber(m[k][0], m[k][1], m[k][2], m[k][3], m[k][4]);
+						b=popToNumber(initialpops[k][0], initialpops[k][1], initialpops[k][2], initialpops[k][3], initialpops[k][4]);
+						if (a>=b) {
+							initialpops[k][k2]=m[k][k2];
+							break;
+						}
 					}
 				}
 			}
 		}
 	}
-	public void mutation(){                                  //变异，5%的概率随机选择位进行变异
+	public void mutation(){                                  //变异，8%的概率进行变异
 		double m=20;
 		int a;
 		double delta=0;
@@ -386,28 +299,28 @@ class Def{
 					case 2:
 						p=popToNumber(f[i][0], f[i][1]);
 						q=popToNumber(initialpops[i][0], initialpops[i][1]);
-						if (f[i][j]>min[j]&&f[i][j]<max[j]&&p>q) {
+						if (p>q) {
 							initialpops[i][j]=f[i][j];
 						}
 						break;
 					case 3:
 						p=popToNumber(f[i][0], f[i][1], f[i][2]);
 						q=popToNumber(initialpops[i][0], initialpops[i][1], initialpops[i][2]);
-						if (f[i][j]>min[j]&&f[i][j]<max[j]&&p>q) {
+						if (p>q) {
 							initialpops[i][j]=f[i][j];
 						}
 						break;	
 					case 4:
 						p=popToNumber(f[i][0], f[i][1], f[i][2], f[i][3]);
 						q=popToNumber(initialpops[i][0], initialpops[i][1], initialpops[i][2], initialpops[i][3]);
-						if (f[i][j]>min[j]&&f[i][j]<max[j]&&p>q) {
+						if (p>q) {
 							initialpops[i][j]=f[i][j];
 						}
 						break;
 					case 5:
 						p=popToNumber(f[i][0], f[i][1], f[i][2], f[i][3], f[i][4]);
 						q=popToNumber(initialpops[i][0], initialpops[i][1], initialpops[i][2], initialpops[i][3], initialpops[i][4]);
-						if (f[i][j]>min[j]&&f[i][j]<max[j]&&p>q) {
+						if (p>q) {
 							initialpops[i][j]=f[i][j];
 						}
 						break;
@@ -437,7 +350,8 @@ public class RCGAdemo extends JFrame {
 	private JTextPane textPane;
 //	private JPanel panel;
 	private Plot2DPanel plot=new Plot2DPanel();
-	private JTextPane textPane_1;
+	private JTextArea textArea;
+	private JScrollPane scrollPane;
 	/**
 	 * Launch the application.
 	 */
@@ -462,7 +376,7 @@ public class RCGAdemo extends JFrame {
 	public RCGAdemo() {
 		setTitle("Optimization Algorithm");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 720, 512);
+		setBounds(100, 100, 711, 512);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -527,34 +441,51 @@ public class RCGAdemo extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Def ga=new Def();
-				Def.func=textPane_1.getText();
+				Def.func=textArea.getText();
 				ga.initial();
-				ga.select();
-				ga.cross();
-				ga.mutation();
-				int numb=Integer.parseInt(SetPar.MaxIter.getText());
+//				ga.cross();
+//				ga.mutation();
+//				ga.select();
 //				System.out.println(Def.func);
-				double X[]=new double[numb];
-				double Y[]=new double[numb];
-				for (int i = 0; i < numb; i++) {
-					for (int j = 0; j < ga.num; j++) {
-						for (int k = 0; k < SetPar.parnum; k++) {
-							
-							System.out.print(ga.initialpops[j][k]+"  ");
-							System.err.println(" ");
-						}
-					}
+				double X[]=new double[Def.numb];
+				double Y[]=new double[Def.numb];
+				for (int i = 0; i < Def.numb; i++) {
 //					ga.initial();
 //	  				ga.select();
-					ga.select();
 					ga.cross();
 					ga.mutation();
+					ga.select();
+					ga.calculate();
+//					for (int j = 0; j < ga.num; j++) {
+//						for (int k = 0; k < SetPar.parnum; k++) {
+//							System.out.print(ga.initialpops[j][k]+"  ");
+//						}
+//						System.out.println();
+//					}
 					X[i]=ga.fitness;
 					Y[i]=i;
 				}
 				plot.addLinePlot("name", Y, X);
-				Result.setText(Double.toString(X[numb-1]));
-				textPane.setText("  x1=");
+				Result.setText(Double.toString(X[Def.numb-1]));
+				switch (SetPar.parnum) {
+				case 2:
+					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]);
+					break;
+				case 3:
+					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
+							+"\n"+ga.initialpops[ga.num-1][2]);
+					break;
+				case 4:
+					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
+							+"\n"+ga.initialpops[ga.num-1][2]+"\n"+ga.initialpops[ga.num-1][3]);
+					break;
+				case 5:
+					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
+							+"\n"+ga.initialpops[ga.num-1][2]+"\n"+ga.initialpops[ga.num-1][3]+"\n"+ga.initialpops[ga.num-1][4]);
+					break;
+				default:
+					break;
+				}
 			}
 
 			
@@ -587,15 +518,11 @@ public class RCGAdemo extends JFrame {
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addComponent(Result, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
 				.addGroup(gl_panel_2.createSequentialGroup()
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addGap(53)
-							.addComponent(lblNewLabel))
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addGap(4)
-							.addComponent(Result, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(59)
+					.addComponent(lblNewLabel)
+					.addContainerGap(62, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -609,6 +536,7 @@ public class RCGAdemo extends JFrame {
 		panel_2.setLayout(gl_panel_2);
 		
 		lblOptimalSolution = new JLabel("Optimal Solution");
+		lblOptimalSolution.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOptimalSolution.setFont(new Font("宋体", Font.PLAIN, 14));
 		
 		textPane = new JTextPane();
@@ -618,26 +546,22 @@ public class RCGAdemo extends JFrame {
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
-							.addGap(16)
-							.addComponent(lblOptimalSolution, GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+					.addGap(13)
+					.addComponent(lblOptimalSolution, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+					.addGap(13))
+				.addComponent(textPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
+					.addGap(1)
 					.addComponent(lblOptimalSolution)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textPane, GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
-					.addContainerGap())
+					.addGap(5)
+					.addComponent(textPane, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);
 		
-		textPane_1 = new JTextPane();
+		scrollPane = new JScrollPane();
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -647,46 +571,53 @@ public class RCGAdemo extends JFrame {
 							.addGap(7)
 							.addComponent(lblObjectiveFunction)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textPane_1, GroupLayout.PREFERRED_SIZE, 290, GroupLayout.PREFERRED_SIZE))
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 295, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(plot, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-					.addGap(22)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(btnNewButton_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnNewButton, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(panel_1, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-							.addComponent(btnExit, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addGap(30))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnExit, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(12)
-							.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(10)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(textPane_1, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblObjectiveFunction, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE))))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addGap(12)
+									.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addGap(9)
+									.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
+							.addPreferredGap(ComponentPlacement.RELATED))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(lblObjectiveFunction, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
+							.addGap(13)))
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(plot, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
 							.addGap(27)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(33)
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 197, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
 							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-							.addComponent(btnExit)))
-					.addContainerGap())
+							.addGap(18)
+							.addComponent(btnExit))
+						.addComponent(plot, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
+		
+		textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
 		plot.setAdjustBounds(true);
 		contentPane.setLayout(gl_contentPane);
 	}
