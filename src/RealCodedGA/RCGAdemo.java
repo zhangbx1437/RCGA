@@ -1,9 +1,6 @@
 package RealCodedGA;
 
-
-
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -34,7 +31,9 @@ import java.awt.event.ActionEvent;
 import java.util.Random;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
-
+import net.miginfocom.swing.MigLayout;
+import javax.swing.SpringLayout;
+import javax.swing.JRadioButton;
 
 
 class Def{
@@ -351,7 +350,10 @@ public class RCGAdemo extends JFrame {
 //	private JPanel panel;
 	private Plot2DPanel plot=new Plot2DPanel();
 	private JTextArea textArea;
-	private JScrollPane scrollPane;
+	private JLabel lblPathOfThe;
+	private JRadioButton obj_rdbtn;
+	private JRadioButton py_rdbtn;
+	private JLabel lblObjectiveFunction;
 	/**
 	 * Launch the application.
 	 */
@@ -380,9 +382,6 @@ public class RCGAdemo extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
-		JLabel lblObjectiveFunction = new JLabel("Objective Function: F(x) =");
-		lblObjectiveFunction.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 15));
 	
 		
 		btnNewButton = new JButton("Set Parameters");
@@ -440,52 +439,57 @@ public class RCGAdemo extends JFrame {
 		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Def ga=new Def();
-				Def.func=textArea.getText();
-				ga.initial();
+				if (obj_rdbtn.isSelected()) {
+					Def ga=new Def();
+					Def.func=textArea.getText();
+					ga.initial();
 //				ga.cross();
 //				ga.mutation();
 //				ga.select();
 //				System.out.println(Def.func);
-				double X[]=new double[Def.numb];
-				double Y[]=new double[Def.numb];
-				for (int i = 0; i < Def.numb; i++) {
+					double X[]=new double[Def.numb];
+					double Y[]=new double[Def.numb];
+					for (int i = 0; i < Def.numb; i++) {
 //					ga.initial();
 //	  				ga.select();
-					ga.cross();
-					ga.mutation();
-					ga.select();
-					ga.calculate();
+						ga.cross();
+						ga.mutation();
+						ga.select();
+						ga.calculate();
 //					for (int j = 0; j < ga.num; j++) {
 //						for (int k = 0; k < SetPar.parnum; k++) {
 //							System.out.print(ga.initialpops[j][k]+"  ");
 //						}
 //						System.out.println();
 //					}
-					X[i]=ga.fitness;
-					Y[i]=i;
+						X[i]=ga.fitness;
+						Y[i]=i;
+					}
+					plot.addLinePlot("RCGA", Y, X);
+					Result.setText(Double.toString(X[Def.numb-1]));
+					switch (SetPar.parnum) {
+					case 2:
+						textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]);
+						break;
+					case 3:
+						textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
+								+"\n"+ga.initialpops[ga.num-1][2]);
+						break;
+					case 4:
+						textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
+								+"\n"+ga.initialpops[ga.num-1][2]+"\n"+ga.initialpops[ga.num-1][3]);
+						break;
+					case 5:
+						textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
+								+"\n"+ga.initialpops[ga.num-1][2]+"\n"+ga.initialpops[ga.num-1][3]+"\n"+ga.initialpops[ga.num-1][4]);
+						break;
+					default:
+						break;
+					}
 				}
-				plot.addLinePlot("name", Y, X);
-				Result.setText(Double.toString(X[Def.numb-1]));
-				switch (SetPar.parnum) {
-				case 2:
-					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]);
-					break;
-				case 3:
-					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
-							+"\n"+ga.initialpops[ga.num-1][2]);
-					break;
-				case 4:
-					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
-							+"\n"+ga.initialpops[ga.num-1][2]+"\n"+ga.initialpops[ga.num-1][3]);
-					break;
-				case 5:
-					textPane.setText(ga.initialpops[ga.num-1][0]+"\n"+ga.initialpops[ga.num-1][1]
-							+"\n"+ga.initialpops[ga.num-1][2]+"\n"+ga.initialpops[ga.num-1][3]+"\n"+ga.initialpops[ga.num-1][4]);
-					break;
-				default:
-					break;
-				}
+				else if (py_rdbtn.isSelected()) {
+					Def ga=new Def();
+				} 
 			}
 
 			
@@ -561,63 +565,94 @@ public class RCGAdemo extends JFrame {
 		);
 		panel_1.setLayout(gl_panel_1);
 		
-		scrollPane = new JScrollPane();
+		JPanel panel = new JPanel();
+		
+		obj_rdbtn = new JRadioButton("Objective Function");
+		obj_rdbtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				py_rdbtn.setSelected(false);
+				lblObjectiveFunction.setVisible(true);
+				lblPathOfThe.setVisible(false);
+			}
+		});
+		obj_rdbtn.setFont(new Font("ËÎÌå", Font.PLAIN, 14));
+		obj_rdbtn.setSelected(true);
+		
+		py_rdbtn = new JRadioButton("Python Script");
+		py_rdbtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				obj_rdbtn.setSelected(false);
+				lblObjectiveFunction.setVisible(false);
+				lblPathOfThe.setVisible(true);
+			}
+		});
+		py_rdbtn.setFont(new Font("ËÎÌå", Font.PLAIN, 14));
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(7)
-							.addComponent(lblObjectiveFunction)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 295, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(plot, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addContainerGap()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
+						.addComponent(plot, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnExit, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(btnExit, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+							.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
+						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+						.addComponent(obj_rdbtn, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+						.addComponent(py_rdbtn, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
+			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addGap(12)
-									.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addGap(9)
-									.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(lblObjectiveFunction, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-							.addGap(13)))
+							.addComponent(obj_rdbtn)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(py_rdbtn))
+						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
-							.addGap(27)
+							.addGap(18)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 197, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
 							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
 							.addComponent(btnExit))
 						.addComponent(plot, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap())
 		);
 		
+		lblObjectiveFunction = new JLabel("Objective Function: F(x) =");
+		lblObjectiveFunction.setBounds(3, 17, 186, 20);
+		lblObjectiveFunction.setHorizontalAlignment(SwingConstants.LEFT);
+		lblObjectiveFunction.setFont(new Font("Î¢ÈíÑÅºÚ", Font.PLAIN, 15));
+		panel.setLayout(null);
+		panel.add(lblObjectiveFunction);
+		
 		textArea = new JTextArea();
-		scrollPane.setViewportView(textArea);
+		textArea.setBounds(189, 7, 272, 44);
+		panel.add(textArea);
 		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
+		
+		lblPathOfThe = new JLabel("Path of The Python Script : ");
+		lblPathOfThe.setVisible(false);
+		lblPathOfThe.setBounds(3, 12, 186, 31);
+		lblPathOfThe.setFont(new Font("Î¢ÈíÑÅºÚ", Font.PLAIN, 14));
+		lblPathOfThe.setHorizontalAlignment(SwingConstants.CENTER);
+		panel.add(lblPathOfThe);
 		plot.setAdjustBounds(true);
 		contentPane.setLayout(gl_contentPane);
 	}
