@@ -1,6 +1,7 @@
 package RealCodedGA;
 
 import java.awt.EventQueue;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -21,6 +22,10 @@ import java.awt.event.MouseEvent;
 import javax.swing.JTextPane;
 
 import org.math.plot.Plot2DPanel;
+import org.python.core.PyFunction;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -28,16 +33,17 @@ import bsh.Interpreter;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Random;
+
 import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.SpringLayout;
 import javax.swing.JRadioButton;
 
 
 class Def{
 	public static String func;                                                              //函数表达式
+	public static PyFunction calc;
+	public static int numb=Integer.parseInt(SetPar.MaxIter.getText());
 	public double [] min={Double.parseDouble(SetPar.min1.getText()),
 						  Double.parseDouble(SetPar.min2.getText()),
 						  Double.parseDouble(SetPar.min3.getText()),
@@ -48,22 +54,18 @@ class Def{
 					 	  Double.parseDouble(SetPar.max3.getText()),
 					 	  Double.parseDouble(SetPar.max4.getText()),
 					 	  Double.parseDouble(SetPar.max5.getText())};                       //参数的取值上界
-	public int num=Integer.parseInt(SetPar.numofind);                        //种群中的个体数
-	double[] fits = new double[num];          //个体适应值
-	int number[]=new int[num];
-	public static int numb=Integer.parseInt(SetPar.MaxIter.getText());
-	public double best[]=new double[SetPar.parnum];                 //最适应个体
-	public double fitness=0;                 //最适应值
-	public double[][] initialpops =new double[num][SetPar.parnum];      //初始种群
-	public int generation;                   //最适应值在种群中的位置
-	public void initial() {         //初始化一个种群
+	public int num=Integer.parseInt(SetPar.numofind);                                       //种群中的个体数
+	public double fitness;                                              //最适应值
+	public double[][] initialpops =new double[num][SetPar.parnum];        //初始种群
+	public double[] fits = new double[num];                                                        //个体适应值
+	public void initial() {                                               //初始化一个种群
 		for (int i = 0; i < num; i++) {
 			for (int j = 0; j < SetPar.parnum; j++) {
-				initialpops[i][j]=min[j]+(max[j]-min[j])*Math.random();                                               //不考虑精度
+				initialpops[i][j]=min[j]+(max[j]-min[j])*Math.random();   //不考虑精度
 			}
 		}
 	}
-	public double popToNumber(double str1, double str2) {             //将输入字符串转为函数表达式,返回适应值
+	public double popToNumber(double str1, double str2) {                 //将输入字符串转为函数表达式,返回适应值
 		String s1=Double.toString(str1);
 		String s2=Double.toString(str2);
 		String f=func.replaceAll("x1",s1);
@@ -135,7 +137,7 @@ class Def{
 			return fit;
 
 	}
-
+	
 	public void calculate(){
 		double sumfit=0;
 		for (int i = 0; i < num; i++) {
@@ -156,36 +158,70 @@ class Def{
 			sumfit+=fits[i];
 		}
 		fitness=sumfit/num;
+		System.out.println(fitness);
 	}
-	public void select(){                  //计算种群每个个体的适应值
-		
-//		fun[0]=func.replaceAll("x1", String.valueOf(Integer.parseInt(c[0], 2)));
-//		Interpreter inter=new Interpreter();
-//		
-////			System.out.println(func);
-//			try {
-//				fitness = (double) inter.eval(fun[0]);
-//			} catch (EvalError e) {
-//
-//			}
-		Random random=new Random();
-		
+	
+	public void py_calculate(){
+		PyObject pyobj;
+        double sumfit=0;
 		for (int i = 0; i < num; i++) {
+			ArrayList<Double> list = new ArrayList<Double>();
 			switch (SetPar.parnum) {
 			case 2:
-				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1]);
+				list.add(initialpops[i][0]);
+				list.add(initialpops[i][1]);
+				pyobj = calc.__call__(new PyList(list));
+				fits[i]=pyobj.asDouble();
 				break;
 			case 3:
-				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2]);
+				list.add(initialpops[i][0]);
+				list.add(initialpops[i][1]);
+				list.add(initialpops[i][2]);
+				pyobj = calc.__call__(new PyList(list));
+				fits[i]=pyobj.asDouble();
 				break;
 			case 4:
-				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3]);
+				list.add(initialpops[i][0]);
+				list.add(initialpops[i][1]);
+				list.add(initialpops[i][2]);
+				list.add(initialpops[i][3]);
+				pyobj = calc.__call__(new PyList(list));
+				fits[i]=pyobj.asDouble();
 				break;
 			case 5:
-				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3],initialpops[i][4]);
+				list.add(initialpops[i][0]);
+				list.add(initialpops[i][1]);
+				list.add(initialpops[i][2]);
+				list.add(initialpops[i][3]);
+				list.add(initialpops[i][4]);
+				pyobj = calc.__call__(new PyList(list));
+				fits[i]=pyobj.asDouble();
 				break;
 			}
-		}	
+			sumfit+=fits[i];
+			System.out.println(fits[i]);
+		}
+		fitness=sumfit/num;
+	}
+	
+	public void select(){                  //计算种群每个个体的适应值
+		Random random=new Random();
+//		for (int i = 0; i < num; i++) {
+//			switch (SetPar.parnum) {
+//			case 2:
+//				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1]);
+//				break;
+//			case 3:
+//				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2]);
+//				break;
+//			case 4:
+//				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3]);
+//				break;
+//			case 5:
+//				fits[i]=popToNumber(initialpops[i][0],initialpops[i][1],initialpops[i][2],initialpops[i][3],initialpops[i][4]);
+//				break;
+//			}
+//		}	
 			//锦标赛法选择
 		for (int i = 0; i < num; i++) {
 			int randnum=random.nextInt(num);	
@@ -196,6 +232,58 @@ class Def{
 			}
 		}
 	}
+//	public void py_select(){
+//		Random random1=new Random();
+//		ArrayList<Double> list = new ArrayList<Double>();
+//		PyObject pyobj;
+//		@SuppressWarnings("resource")
+//		PythonInterpreter interpreter = new PythonInterpreter(); 
+//		interpreter.execfile(func);
+//        PyFunction calc = (PyFunction)interpreter.get("calculate",PyFunction.class);  
+//		for (int i = 0; i < num; i++) {
+//			switch (SetPar.parnum) {
+//			case 2:
+//				list.add(initialpops[i][0]);
+//				list.add(initialpops[i][1]);
+//				pyobj = calc.__call__(new PyList(list));
+//				fits[i]=pyobj.asDouble();
+//				break;
+//			case 3:
+//				list.add(initialpops[i][0]);
+//				list.add(initialpops[i][1]);
+//				list.add(initialpops[i][2]);
+//				pyobj = calc.__call__(new PyList(list));
+//				fits[i]=pyobj.asDouble();
+//				break;
+//			case 4:
+//				list.add(initialpops[i][0]);
+//				list.add(initialpops[i][1]);
+//				list.add(initialpops[i][2]);
+//				list.add(initialpops[i][3]);
+//				pyobj = calc.__call__(new PyList(list));
+//				fits[i]=pyobj.asDouble();
+//				break;
+//			case 5:
+//				list.add(initialpops[i][0]);
+//				list.add(initialpops[i][1]);
+//				list.add(initialpops[i][2]);
+//				list.add(initialpops[i][3]);
+//				list.add(initialpops[i][4]);
+//				pyobj = calc.__call__(new PyList(list));
+//				fits[i]=pyobj.asDouble();
+//				break;
+//			}
+//		}
+//		for (int i = 0; i < num; i++) {
+//			int randnum=random1.nextInt(num);	
+//			if (fits[i]<fits[randnum]) {
+//				for (int j = 0; j < SetPar.parnum; j++) {
+//					initialpops[i][j]=initialpops[randnum][j];
+//				}
+//			}
+//		}
+//	}
+	
 	public void cross(){                                    //交叉
 		double m[][]=new double [num][SetPar.parnum];
 		double a,b;
@@ -208,30 +296,6 @@ class Def{
 				}
 			}
 		
-//					do {
-//						n++;
-//						m[i][j]=initialpops[i][j]-Math.pow(1-alpha[j],n)*(initialpops[i][j]-initialpops[k][j]);
-//					}while(m[i][j]<min[j]||m[i][j]>max[j]);
-//					else {
-//						k=(k+1)%num;
-//						m[i][j]=alpha[j]*initialpops[i][j]+(1-alpha[j])*(initialpops[i][j]-initialpops[k][j]);
-//						do {
-//							n++;
-//							m[i][j]=alpha[j]*initialpops[i][j]+Math.pow(1-alpha[j],n)*(initialpops[i][j]-initialpops[k][j]);
-//						}while(m[i][j]<min[j]||m[i][j]>max[j]);
-//					}
-					
-//					pmin=(m[i][j]<m[(i+1)/num][j])?m[i][j]:m[(i+1)/num][j];
-//					pmax=(m[i][j]>m[(i+1)/num][j])?m[i][j]:m[(i+1)/num][j];
-//					do {
-//						n++;
-//						if (Math.random()<0.5) {
-//							m[i][j]=initialpops[i][j]+Math.pow(1-alpha,n)*(initialpops[i][j]-initialpops[(i+1)/num][j]);
-//						}
-//						else {
-//							m[i][j]=initialpops[i][j]-Math.pow(1-alpha,n)*(initialpops[i][j]-initialpops[(i+1)/num][j]);
-//						}
-//					}while(m[i][j]<min[j]||m[i][j]>max[j]);
 			for (int k = 0; k < num; k++) {
 				for (int k2 = 0; k2 < SetPar.parnum; k2++) {
 					switch (SetPar.parnum) {
@@ -351,8 +415,8 @@ public class RCGAdemo extends JFrame {
 	private Plot2DPanel plot=new Plot2DPanel();
 	private JTextArea textArea;
 	private JLabel lblPathOfThe;
-	private JRadioButton obj_rdbtn;
-	private JRadioButton py_rdbtn;
+	public JRadioButton obj_rdbtn;
+	public JRadioButton py_rdbtn;
 	private JLabel lblObjectiveFunction;
 	/**
 	 * Launch the application.
@@ -439,32 +503,37 @@ public class RCGAdemo extends JFrame {
 		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				double X[]=new double[Def.numb];
+				double Y[]=new double[Def.numb];
+				Def ga=new Def();
+				Def.func=textArea.getText();
+				PythonInterpreter interpreter = new PythonInterpreter(); 
+				ga.initial();
 				if (obj_rdbtn.isSelected()) {
-					Def ga=new Def();
-					Def.func=textArea.getText();
-					ga.initial();
-//				ga.cross();
-//				ga.mutation();
-//				ga.select();
-//				System.out.println(Def.func);
-					double X[]=new double[Def.numb];
-					double Y[]=new double[Def.numb];
 					for (int i = 0; i < Def.numb; i++) {
-//					ga.initial();
-//	  				ga.select();
 						ga.cross();
 						ga.mutation();
 						ga.select();
 						ga.calculate();
-//					for (int j = 0; j < ga.num; j++) {
-//						for (int k = 0; k < SetPar.parnum; k++) {
-//							System.out.print(ga.initialpops[j][k]+"  ");
-//						}
-//						System.out.println();
-//					}
 						X[i]=ga.fitness;
 						Y[i]=i;
+						
 					}
+				}
+				else if (py_rdbtn.isSelected()) {
+					interpreter.execfile(Def.func);
+					Def.calc = (PyFunction)interpreter.get("calculate",PyFunction.class);
+					for (int i = 0; i < Def.numb; i++) {
+						ga.cross();
+						ga.mutation();
+						ga.select();
+						ga.py_calculate();
+						X[i]=ga.fitness;
+						Y[i]=i;
+						
+					}
+				}
+				
 					plot.addLinePlot("RCGA", Y, X);
 					Result.setText(Double.toString(X[Def.numb-1]));
 					switch (SetPar.parnum) {
@@ -487,13 +556,8 @@ public class RCGAdemo extends JFrame {
 						break;
 					}
 				}
-				else if (py_rdbtn.isSelected()) {
-					Def ga=new Def();
-				} 
 			}
-
-			
-		});
+		);
 		btnNewButton_1.setFont(new Font("宋体", Font.PLAIN, 14));
 		
 //		panel = plot;
